@@ -23,18 +23,18 @@ let setup = () => {
   disable_cursor();
 
   set_target_fps(60);
-  (camera, World.initial_blocks);
+  (camera, World.initial_blocks());
 };
 
 let draw_all = (camera, blocks) => {
   begin_drawing();
   clear_background(Color.raywhite);
   begin_mode_3d(camera);
-  List.iteri(
+  Array.iteri(
     (height, ltr) => {
-      List.iteri(
+      Array.iteri(
         (i, fwb) => {
-          List.iteri(
+          Array.iteri(
             (j, block) => {
               let position =
                 Vector3.create(
