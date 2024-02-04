@@ -47,6 +47,7 @@ let setup = () => {
         };
       },
     );
+  disable_cursor();
 
   set_target_fps(60);
   (camera, columns);
@@ -79,7 +80,21 @@ let rec loop = ((camera, columns)) => {
   if (window_should_close()) {
     close_window();
   } else {
-    update_camera(addr(camera), CameraMode.First_person);
+    // update_camera(addr(camera), CameraMode.First_person);
+    update_camera_pro(
+      addr(camera),
+      Vector3.create(
+        (is_key_down(Key.S) ? 0. : 0.1) -. (is_key_down(Key.W) ? 0. : 0.1),
+        (is_key_down(Key.A) ? 0. : 0.1) -. (is_key_down(Key.D) ? 0. : 0.1),
+        0.0,
+      ),
+      Vector3.create(
+        Vector2.x(get_mouse_delta()) *. 0.5,
+        Vector2.y(get_mouse_delta()) *. 0.5,
+        0.0,
+      ),
+      0.,
+    );
   };
   draw_all(camera, columns);
   loop((camera, columns));
