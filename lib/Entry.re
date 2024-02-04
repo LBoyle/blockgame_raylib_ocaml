@@ -1,7 +1,7 @@
 open Raylib;
 
-let width = 800;
-let height = 450;
+let width = 1920;
+let height = 1080;
 
 type column_t = {
   height: float,
@@ -10,11 +10,7 @@ type column_t = {
 };
 
 let setup = () => {
-  init_window(
-    width,
-    height,
-    "raylib [core] example - 3d camera first person",
-  );
+  init_window(width, height, "blockgame");
   let camera =
     Camera.create(
       Vector3.create(4.0, 2.0, 4.0),
@@ -24,63 +20,54 @@ let setup = () => {
       CameraProjection.Perspective,
     );
 
-  let columns =
-    List.init(
-      20,
-      _ => {
-        let height = Float.of_int(get_random_value(1, 12));
-        {
-          height,
-          position:
-            Vector3.create(
-              Float.of_int(get_random_value(-15, 15)),
-              height /. 2.0,
-              Float.of_int(get_random_value(-15, 15)),
-            ),
-          color:
-            Color.create(
-              get_random_value(20, 255),
-              get_random_value(10, 55),
-              30,
-              255,
-            ),
-        };
-      },
-    );
   disable_cursor();
 
   set_target_fps(60);
-  (camera, columns);
+  (camera, World.initial_blocks);
 };
 
-let draw_all = (camera, columns) => {
+let draw_all = (camera, blocks) => {
   begin_drawing();
   clear_background(Color.raywhite);
   begin_mode_3d(camera);
-  draw_plane(
-    Vector3.create(0.0, 0.0, 0.0),
-    Vector2.create(32.0, 32.0),
-    Color.lightgray,
-  );
-  draw_cube(Vector3.create(-16.0, 2.5, 0.0), 1.0, 5.0, 32.0, Color.blue);
-  draw_cube(Vector3.create(16.0, 2.5, 0.0), 1.0, 5.0, 32.0, Color.lime);
-  draw_cube(Vector3.create(0.0, 2.5, 16.0), 32.0, 5.0, 1.0, Color.gold);
-  List.iter(
-    ({position, height, color}) => {
-      draw_cube(position, 2.0, height, 2.0, color);
-      draw_cube_wires(position, 2.0, height, 2.0, Color.maroon);
+  List.iteri(
+    (height, ltr) => {
+      List.iteri(
+        (i, fwb) => {
+          List.iteri(
+            (j, block) => {
+              let position =
+                Vector3.create(
+                  float_of_int(i),
+                  float_of_int(height),
+                  float_of_int(j),
+                );
+              switch (Block.get_block_colour(block)) {
+              | None => ()
+              | Some(blockColour) =>
+                draw_cube(position, 2.0, 1., 2.0, blockColour)
+              };
+
+              draw_cube_wires(position, 2.0, 1., 2.0, Color.maroon);
+              ();
+            },
+            fwb,
+          );
+          ();
+        },
+        ltr,
+      )
     },
-    columns,
+    blocks,
   );
   end_mode_3d();
   end_drawing();
 };
 
-let rec loop = ((camera, columns)) => {
+let rec loop = ((camera, blocks)) => {
   if (window_should_close()) {
     close_window();
   } else {
-    // update_camera(addr(camera), CameraMode.First_person);
     update_camera_pro(
       addr(camera),
       Vector3.create(
@@ -96,6 +83,6 @@ let rec loop = ((camera, columns)) => {
       0.,
     );
   };
-  draw_all(camera, columns);
-  loop((camera, columns));
+  draw_all(camera, blocks);
+  loop((camera, blocks));
 };
