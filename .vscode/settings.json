@@ -1,0 +1,7 @@
+{
+  "ocaml.sandbox": {
+    "kind": "opam",
+    "switch": "${workspaceFolder:blockgame_raylib}"
+  },
+  "ocaml.server.codelens": true
+}

@@ -1,0 +1,4 @@
+(library
+ (name blockgame_raylib)
+ (modules entry)
+ (libraries raylib raygui))

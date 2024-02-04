@@ -1,0 +1,4 @@
+(executable
+ (public_name blockgame_raylib)
+ (name main)
+ (libraries blockgame_raylib))
