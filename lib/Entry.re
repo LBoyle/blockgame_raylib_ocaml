@@ -7,6 +7,11 @@ type column_t = {
   color: Raylib.Color.t,
 };
 
+// let chunk1 = World.generate_chunk();
+// let chunk2 = World.generate_chunk();
+
+let chunks = Array.make(4, World.generate_chunk());
+
 let setup = () => {
   init_window(width, height, "blockgame");
   let camera =
@@ -18,10 +23,10 @@ let setup = () => {
       CameraProjection.Perspective,
     );
 
-  disable_cursor();
+  // disable_cursor();
 
   set_target_fps(60);
-  (camera, World.initial_blocks());
+  camera;
 };
 
 let indexTo3dCoord = b =>
@@ -31,26 +36,41 @@ let indexTo3dCoord = b =>
     float_of_int(b / chunkSize mod chunkSize),
   );
 
-let draw_all = (camera, blocks) => {
+let draw_block = (b, block) => {
+  let position = indexTo3dCoord(b);
+  draw_cube_wires(position, 1., 1., 1., Color.maroon);
+  switch (Block.get_block_colour(block)) {
+  | None => ()
+  | Some(blockColour) => draw_cube(position, 1., 1., 1., blockColour)
+  };
+};
+
+let draw_offset_block = (offset, b, block) => {
+  let position = Vector3.add(indexTo3dCoord(b), offset);
+  draw_cube_wires(position, 1., 1., 1., Color.maroon);
+  switch (Block.get_block_colour(block)) {
+  | None => ()
+  | Some(blockColour) => draw_cube(position, 1., 1., 1., blockColour)
+  };
+};
+
+let draw_all = camera => {
   begin_drawing();
   clear_background(Color.raywhite);
   begin_mode_3d(camera);
   Array.iteri(
-    (b, block) => {
-      let position = indexTo3dCoord(b);
-      draw_cube_wires(position, 1., 1., 1., Color.maroon);
-      switch (Block.get_block_colour(block)) {
-      | None => ()
-      | Some(blockColour) => draw_cube(position, 1., 1., 1., blockColour)
-      };
-    },
-    blocks,
+    (ci, chunk) =>
+      Array.iteri(
+        draw_offset_block(Vector3.create(float_of_int(ci * 16), 0., 0.)),
+        chunk,
+      ),
+    chunks,
   );
   end_mode_3d();
   end_drawing();
 };
 
-let rec loop = ((camera, blocks)) => {
+let rec loop = camera => {
   if (window_should_close()) {
     close_window();
   } else {
@@ -69,7 +89,12 @@ let rec loop = ((camera, blocks)) => {
       0.,
     );
   };
-
-  draw_all(camera, blocks);
-  loop((camera, blocks));
+  // let blocks =
+  //   if (is_key_pressed(Key.G)) {
+  //     Array.append(blocks, World.generate_chunk());
+  //   } else {
+  //     blocks;
+  //   };
+  draw_all(camera);
+  loop(camera);
 };
