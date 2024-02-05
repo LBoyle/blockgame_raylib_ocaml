@@ -1,4 +1,4 @@
 (library
  (name blockgame_raylib)
- (modules entry world block)
+ (modules entry world block constants)
  (libraries raylib raygui))

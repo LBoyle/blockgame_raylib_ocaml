@@ -1,16 +1,11 @@
 open Raylib;
-
-let width = 1920;
-let height = 1080;
+open Constants;
 
 type column_t = {
   height: float,
   position: Raylib.Vector3.t,
   color: Raylib.Color.t,
 };
-
-let chunkArrayLength = 16 * 16 * 3;
-let chunkSize = 16;
 
 let setup = () => {
   init_window(width, height, "blockgame");
