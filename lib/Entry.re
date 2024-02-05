@@ -7,13 +7,22 @@ type column_t = {
   color: Raylib.Color.t,
 };
 
-let chunks = Array.make(4, World.generate_chunk());
+// How do I load and unload chunks?
+// let chunks = Array.make(4, World.generate_chunk());
+
+let world =
+  Array.make(worldSizeInChunks * worldSizeInChunks, World.generate_chunk());
+
+type state_t = {
+  camera: Camera3D.t,
+  activeChunks: list(int),
+};
 
 let setup = () => {
-  init_window(width, height, "blockgame");
+  init_window(vhWidth, vhHeight, "blockgame");
   let camera =
     Camera.create(
-      Vector3.create(4.0, 2.0, 4.0),
+      Vector3.create(4.0, 3.0, 4.0),
       Vector3.create(0.0, 1.8, 0.0),
       Vector3.create(0.0, 1.0, 0.0),
       80.0,
@@ -23,27 +32,25 @@ let setup = () => {
   disable_cursor();
 
   set_target_fps(60);
-  camera;
+  {camera, activeChunks: []};
 };
 
-let indexTo3dCoord = b =>
+let index_to_3d_coord = b =>
   Vector3.create(
     float_of_int(b mod chunkSize),
     float_of_int(b / (chunkSize * chunkSize)),
     float_of_int(b / chunkSize mod chunkSize),
   );
 
-let draw_block = (b, block) => {
-  let position = indexTo3dCoord(b);
-  draw_cube_wires(position, 1., 1., 1., Color.maroon);
-  switch (Block.get_block_colour(block)) {
-  | None => ()
-  | Some(blockColour) => draw_cube(position, 1., 1., 1., blockColour)
-  };
-};
+let index_to_2d_coord = ci =>
+  Vector3.create(
+    float_of_int(ci mod worldSizeInChunks * chunkSize),
+    0.,
+    float_of_int(ci / worldSizeInChunks * chunkSize),
+  );
 
 let draw_offset_block = (offset, b, block) => {
-  let position = Vector3.add(indexTo3dCoord(b), offset);
+  let position = Vector3.add(index_to_3d_coord(b), offset);
   draw_cube_wires(position, 1., 1., 1., Color.maroon);
   switch (Block.get_block_colour(block)) {
   | None => ()
@@ -51,30 +58,33 @@ let draw_offset_block = (offset, b, block) => {
   };
 };
 
-let draw_all = camera => {
+let draw_all = state => {
   begin_drawing();
   clear_background(Color.raywhite);
-  begin_mode_3d(camera);
+  begin_mode_3d(state.camera);
   Array.iteri(
     (ci, chunk) =>
-      Array.iteri(
-        draw_offset_block(Vector3.create(float_of_int(ci * 16), 0., 0.)),
-        chunk,
-      ),
-    chunks,
+      Array.iteri(draw_offset_block(index_to_2d_coord(ci)), chunk),
+    world,
   );
   end_mode_3d();
   end_drawing();
 };
 
-let rec loop = camera => {
+let rec loop = state => {
   if (window_should_close()) {
     close_window();
   } else {
     let delta = get_frame_time();
+    let moveSpeed =
+      if (is_key_down(Key.Left_shift)) {
+        moveSpeed *. 2.;
+      } else {
+        moveSpeed;
+      };
     let mv = moveSpeed *. delta;
     update_camera_pro(
-      addr(camera),
+      addr(state.camera),
       Vector3.create(
         (is_key_down(Key.S) ? 0. : mv) -. (is_key_down(Key.W) ? 0. : mv),
         (is_key_down(Key.A) ? 0. : mv) -. (is_key_down(Key.D) ? 0. : mv),
@@ -88,6 +98,6 @@ let rec loop = camera => {
       0.,
     );
   };
-  draw_all(camera);
-  loop(camera);
+  draw_all(state);
+  loop(state);
 };
