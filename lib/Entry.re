@@ -7,9 +7,6 @@ type column_t = {
   color: Raylib.Color.t,
 };
 
-// let chunk1 = World.generate_chunk();
-// let chunk2 = World.generate_chunk();
-
 let chunks = Array.make(4, World.generate_chunk());
 
 let setup = () => {
@@ -23,7 +20,7 @@ let setup = () => {
       CameraProjection.Perspective,
     );
 
-  // disable_cursor();
+  disable_cursor();
 
   set_target_fps(60);
   camera;
@@ -74,11 +71,13 @@ let rec loop = camera => {
   if (window_should_close()) {
     close_window();
   } else {
+    let delta = get_frame_time();
+    let mv = moveSpeed *. delta;
     update_camera_pro(
       addr(camera),
       Vector3.create(
-        (is_key_down(Key.S) ? 0. : 0.1) -. (is_key_down(Key.W) ? 0. : 0.1),
-        (is_key_down(Key.A) ? 0. : 0.1) -. (is_key_down(Key.D) ? 0. : 0.1),
+        (is_key_down(Key.S) ? 0. : mv) -. (is_key_down(Key.W) ? 0. : mv),
+        (is_key_down(Key.A) ? 0. : mv) -. (is_key_down(Key.D) ? 0. : mv),
         0.0,
       ),
       Vector3.create(
@@ -89,12 +88,6 @@ let rec loop = camera => {
       0.,
     );
   };
-  // let blocks =
-  //   if (is_key_pressed(Key.G)) {
-  //     Array.append(blocks, World.generate_chunk());
-  //   } else {
-  //     blocks;
-  //   };
   draw_all(camera);
   loop(camera);
 };
