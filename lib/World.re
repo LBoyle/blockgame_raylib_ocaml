@@ -1,20 +1,11 @@
-let initial_blocks = () => [|
-  [|
-    [|Block.Dirt, Dirt, Dirt, Dirt, Dirt|],
-    [|Dirt, Dirt, Dirt, Dirt, Dirt|],
-    [|Dirt, Dirt, Dirt, Dirt, Dirt|],
-    [|Dirt, Dirt, Dirt, Dirt, Dirt|],
-  |],
-  [|
-    [|Grass, Grass, Grass, Grass, Grass|],
-    [|Grass, Grass, Grass, Grass, Grass|],
-    [|Grass, Grass, Grass, Grass, Grass|],
-    [|Grass, Grass, Grass, Grass, Grass|],
-  |],
-  [|
-    [|Air, Air, Air, Air, Air|],
-    [|Air, Air, Air, Air, Air|],
-    [|Air, Air, Air, Air, Air|],
-    [|Air, Air, Air, Air, Air|],
-  |],
-|];
+let generate_chunk = () => {
+  Array.make(16 * 16, Block.Air)
+  |> Array.append(Array.make(16 * 16, Block.Grass))
+  |> Array.append(Array.make(16 * 16, Block.Dirt));
+};
+
+let initial_blocks = () => {
+  Array.make(16 * 16, Block.Air)
+  |> Array.append(Array.make(16 * 16, Block.Grass))
+  |> Array.append(Array.make(16 * 16, Block.Dirt));
+};

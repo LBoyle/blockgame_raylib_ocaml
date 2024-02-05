@@ -9,6 +9,9 @@ type column_t = {
   color: Raylib.Color.t,
 };
 
+let chunkArrayLength = 16 * 16 * 3;
+let chunkSize = 16;
+
 let setup = () => {
   init_window(width, height, "blockgame");
   let camera =
@@ -26,37 +29,25 @@ let setup = () => {
   (camera, World.initial_blocks());
 };
 
+let indexTo3dCoord = b =>
+  Vector3.create(
+    float_of_int(b mod chunkSize),
+    float_of_int(b / (chunkSize * chunkSize)),
+    float_of_int(b / chunkSize mod chunkSize),
+  );
+
 let draw_all = (camera, blocks) => {
   begin_drawing();
   clear_background(Color.raywhite);
   begin_mode_3d(camera);
   Array.iteri(
-    (height, ltr) => {
-      Array.iteri(
-        (i, fwb) => {
-          Array.iteri(
-            (j, block) => {
-              let position =
-                Vector3.create(
-                  float_of_int(i),
-                  float_of_int(height),
-                  float_of_int(j),
-                );
-              switch (Block.get_block_colour(block)) {
-              | None => ()
-              | Some(blockColour) =>
-                draw_cube(position, 2.0, 1., 2.0, blockColour)
-              };
-
-              draw_cube_wires(position, 2.0, 1., 2.0, Color.maroon);
-              ();
-            },
-            fwb,
-          );
-          ();
-        },
-        ltr,
-      )
+    (b, block) => {
+      let position = indexTo3dCoord(b);
+      draw_cube_wires(position, 1., 1., 1., Color.maroon);
+      switch (Block.get_block_colour(block)) {
+      | None => ()
+      | Some(blockColour) => draw_cube(position, 1., 1., 1., blockColour)
+      };
     },
     blocks,
   );
@@ -83,6 +74,7 @@ let rec loop = ((camera, blocks)) => {
       0.,
     );
   };
+
   draw_all(camera, blocks);
   loop((camera, blocks));
 };
