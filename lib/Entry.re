@@ -72,6 +72,7 @@ type state_t = {
   camera: Camera3D.t,
   activeChunks: list(int),
   playerPosition: Vector3.t,
+  testMesh: Model.t,
 };
 
 let startingPosition = Vector3.create(4., 6., 4.);
@@ -94,6 +95,7 @@ let setup = () => {
     camera,
     activeChunks: get_active_chunks_ids(startingPosition),
     playerPosition: startingPosition,
+    testMesh: load_model_from_mesh(gen_mesh_plane(3., 3., 10, 10)),
   };
 };
 
@@ -121,10 +123,22 @@ let draw_all = state => {
     },
     state.activeChunks,
   );
-  Array.iteri(
-    (ci, chunk) =>
-      Array.iteri(draw_offset_wires(index_to_2d_coord(ci)), chunk),
-    world,
+  // Array.iteri(
+  //   (ci, chunk) =>
+  //     Array.iteri(draw_offset_wires(index_to_2d_coord(ci)), chunk),
+  //   world,
+  // );
+  // draw_model(
+  //   state.testMesh,
+  //   Vector3.create(10., 4., 10.),
+  //   6.,
+  //   Color.lightgray,
+  // );
+  draw_model_wires(
+    state.testMesh,
+    Vector3.create(10., 4., 10.),
+    6.,
+    Color.maroon,
   );
   end_mode_3d();
   end_drawing();
