@@ -1,4 +1,4 @@
 (library
  (name blockgame_raylib)
- (modules entry world block constants chunkMeshGenerator)
+ (modules entry world block constants chunkMeshGenerator utils)
  (libraries raylib raygui))

@@ -1,43 +1,12 @@
 open Raylib;
 open Constants;
+open Utils;
 
 // World is a 1d array 2d grid of Chunks
 // a Chunk is a 1d array 3d grid of Blocks
 // a Block is a variant or symbol
 let world =
   Array.make(worldSizeInChunks * worldSizeInChunks, World.generate_chunk());
-
-let index_to_3d_coord = b =>
-  Vector3.create(
-    float_of_int(b mod chunkSize),
-    float_of_int(b / (chunkSize * chunkSize)),
-    float_of_int(b / chunkSize mod chunkSize),
-  );
-
-let index_to_2d_coord = ci =>
-  Vector3.create(
-    float_of_int(ci mod worldSizeInChunks * chunkSize),
-    0.,
-    float_of_int(ci / worldSizeInChunks * chunkSize),
-  );
-
-let clamp_index = i =>
-  if (i < 0) {
-    0;
-  } else if (i >= worldSizeInChunks * worldSizeInChunks) {
-    worldSizeInChunks * worldSizeInChunks;
-  } else {
-    i;
-  };
-
-let clamp_index_opt = i =>
-  if (i < 0) {
-    None;
-  } else if (i >= worldSizeInChunks * worldSizeInChunks) {
-    None;
-  } else {
-    Some(i);
-  };
 
 let get_active_chunks_ids = (pos: Vector3.t) => {
   let (x, z) = (
@@ -72,7 +41,7 @@ type state_t = {
   camera: Camera3D.t,
   activeChunks: list(int),
   playerPosition: Vector3.t,
-  testMesh: Model.t,
+  // testModel: Model.t,
 };
 
 let startingPosition = Vector3.create(4., 6., 4.);
@@ -95,7 +64,7 @@ let setup = () => {
     camera,
     activeChunks: get_active_chunks_ids(startingPosition),
     playerPosition: startingPosition,
-    testMesh: load_model_from_mesh(gen_mesh_plane(3., 3., 10, 10)),
+    // testModel: load_model_from_mesh(gen_mesh_plane(3., 3., 10, 10)),
   };
 };
 
@@ -112,6 +81,12 @@ let draw_offset_wires = (offset, b, _block) => {
   draw_cube_wires(position, 1., 1., 1., Color.maroon);
 };
 
+let sci = 0;
+let sbi = 26;
+let specialChunk = world[sci];
+let specialBlock = specialChunk[sbi];
+let (n, e, s, w, a, b) = ChunkMeshGenerator.get_block_neighbor_ids(sbi);
+
 let draw_all = state => {
   begin_drawing();
   clear_background(Color.raywhite);
@@ -123,23 +98,31 @@ let draw_all = state => {
     },
     state.activeChunks,
   );
+
+  draw_offset_wires(index_to_2d_coord(sci), sbi, specialBlock);
+  draw_offset_wires(index_to_2d_coord(sci), n, specialBlock);
+  draw_offset_wires(index_to_2d_coord(sci), e, specialBlock);
+  draw_offset_wires(index_to_2d_coord(sci), s, specialBlock);
+  draw_offset_wires(index_to_2d_coord(sci), w, specialBlock);
+  draw_offset_wires(index_to_2d_coord(sci), a, specialBlock);
+  draw_offset_wires(index_to_2d_coord(sci), b, specialBlock);
   // Array.iteri(
   //   (ci, chunk) =>
   //     Array.iteri(draw_offset_wires(index_to_2d_coord(ci)), chunk),
   //   world,
   // );
   // draw_model(
-  //   state.testMesh,
+  //   state.testModel,
   //   Vector3.create(10., 4., 10.),
   //   6.,
   //   Color.lightgray,
   // );
-  draw_model_wires(
-    state.testMesh,
-    Vector3.create(10., 4., 10.),
-    6.,
-    Color.maroon,
-  );
+  // draw_model_wires(
+  //   state.testModel,
+  //   Vector3.create(10., 4., 10.),
+  //   6.,
+  //   Color.maroon,
+  // );
   end_mode_3d();
   end_drawing();
 };
