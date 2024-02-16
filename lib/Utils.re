@@ -22,6 +22,11 @@ let clamp_index_opt = i =>
   | n => Some(n)
   };
 
+let cull_wrapped_active_chunk = (i: int, pidx: int) => {
+  pidx |> ignore;
+  Some(i);
+};
+
 let get_active_chunks_ids = (pos: Vector3.t) => {
   let (x, z) = (
     (Vector3.x(pos) |> floor |> int_of_float) / chunkSize,
@@ -29,7 +34,7 @@ let get_active_chunks_ids = (pos: Vector3.t) => {
   );
   // Player chunk index
   let pidx = x + z * worldSizeInChunks;
-  // FIX ME
+  // FIX ME do this programatically
   [
     pidx - worldSizeInChunks - worldSizeInChunks,
     pidx - worldSizeInChunks - 1,
@@ -45,5 +50,10 @@ let get_active_chunks_ids = (pos: Vector3.t) => {
     pidx + worldSizeInChunks + 1,
     pidx + worldSizeInChunks + worldSizeInChunks,
   ]
-  |> List.filter_map(clamp_index_opt);
+  |> List.filter_map(n =>
+       switch (clamp_index_opt(n)) {
+       | None => None
+       | Some(n) => cull_wrapped_active_chunk(n, pidx)
+       }
+     );
 };
