@@ -22,10 +22,15 @@ let clamp_index_opt = i =>
   | n => Some(n)
   };
 
-let cull_wrapped_active_chunk = (i: int, pidx: int) => {
-  pidx |> ignore;
-  Some(i);
-};
+let sqr = n => n * n;
+
+let euclidean_distance = (px, pz, cx, cz) =>
+  sqrt(float_of_int(sqr(cx - px) + sqr(cz - pz)));
+
+let cull_wrapped_active_chunk = (ci: int, px: int, pz: int) =>
+  euclidean_distance(px, pz, ci mod worldSizeInChunks, ci / worldSizeInChunks)
+  > float_of_int(viewDistanceInChunks + 1)
+    ? None : Some(ci);
 
 let get_active_chunks_ids = (pos: Vector3.t) => {
   let (x, z) = (
@@ -50,10 +55,10 @@ let get_active_chunks_ids = (pos: Vector3.t) => {
     pidx + worldSizeInChunks + 1,
     pidx + worldSizeInChunks + worldSizeInChunks,
   ]
-  |> List.filter_map(n =>
-       switch (clamp_index_opt(n)) {
+  |> List.filter_map(ci =>
+       switch (clamp_index_opt(ci)) {
        | None => None
-       | Some(n) => cull_wrapped_active_chunk(n, pidx)
+       | Some(ci) => cull_wrapped_active_chunk(ci, x, z)
        }
      );
 };
