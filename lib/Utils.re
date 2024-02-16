@@ -27,24 +27,23 @@ let get_active_chunks_ids = (pos: Vector3.t) => {
     (Vector3.x(pos) |> floor |> int_of_float) / chunkSize,
     (Vector3.z(pos) |> floor |> int_of_float) / chunkSize,
   );
-  let playerChunk = x + z * worldSizeInChunks;
+  // Player chunk index
+  let pidx = x + z * worldSizeInChunks;
   // FIX ME
-  let res =
-    [
-      playerChunk - worldSizeInChunks - worldSizeInChunks,
-      playerChunk - worldSizeInChunks - 1,
-      playerChunk - worldSizeInChunks,
-      playerChunk - worldSizeInChunks + 1,
-      playerChunk - 2,
-      playerChunk - 1,
-      playerChunk,
-      playerChunk + 1,
-      playerChunk + 2,
-      playerChunk + worldSizeInChunks - 1,
-      playerChunk + worldSizeInChunks,
-      playerChunk + worldSizeInChunks + 1,
-      playerChunk + worldSizeInChunks + worldSizeInChunks,
-    ]
-    |> List.filter_map(x => clamp_index_opt(x));
-  res;
+  [
+    pidx - worldSizeInChunks - worldSizeInChunks,
+    pidx - worldSizeInChunks - 1,
+    pidx - worldSizeInChunks,
+    pidx - worldSizeInChunks + 1,
+    pidx - 2,
+    pidx - 1,
+    pidx,
+    pidx + 1,
+    pidx + 2,
+    pidx + worldSizeInChunks - 1,
+    pidx + worldSizeInChunks,
+    pidx + worldSizeInChunks + 1,
+    pidx + worldSizeInChunks + worldSizeInChunks,
+  ]
+  |> List.filter_map(clamp_index_opt);
 };
