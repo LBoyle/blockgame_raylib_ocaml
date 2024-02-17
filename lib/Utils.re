@@ -17,7 +17,7 @@ let index_to_2d_coord = ci =>
 
 let clamp_index_opt = i =>
   switch (i) {
-  | n when n < 0 => None
+  | n when n <= - (worldSizeInChunks * worldSizeInChunks) => None
   | n when n >= worldSizeInChunks * worldSizeInChunks => None
   | n => Some(n)
   };
@@ -27,6 +27,7 @@ let sqr = n => n * n;
 let euclidean_distance = (px, pz, cx, cz) =>
   sqrt(float_of_int(sqr(cx - px) + sqr(cz - pz)));
 
+// Check if the selected chunk is on the other side of the world
 let cull_wrapped_active_chunk = (ci: int, px: int, pz: int) =>
   euclidean_distance(px, pz, ci mod worldSizeInChunks, ci / worldSizeInChunks)
   > float_of_int(viewDistanceInChunks + 1)
@@ -39,7 +40,7 @@ let get_active_chunks_ids = (pos: Vector3.t) => {
   );
   // Player chunk index
   let pidx = x + z * worldSizeInChunks;
-  // FIX ME do this programatically
+  // FIX ME do this programatically using viewDistanceInChunks
   [
     pidx - worldSizeInChunks - worldSizeInChunks,
     pidx - worldSizeInChunks - 1,
