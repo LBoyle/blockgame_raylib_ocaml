@@ -30,7 +30,7 @@ let euclidean_distance = (px, pz, cx, cz) =>
 // Check if the selected chunk is on the other side of the world
 let cull_wrapped_active_chunk = (ci: int, px: int, pz: int) =>
   euclidean_distance(px, pz, ci mod worldSizeInChunks, ci / worldSizeInChunks)
-  > float_of_int(viewDistanceInChunks + 1)
+  > float_of_int(viewDistanceInChunks)
     ? None : Some(ci);
 
 let get_active_chunks_ids = (pos: Vector3.t) => {

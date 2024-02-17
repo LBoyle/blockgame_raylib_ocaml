@@ -16,13 +16,13 @@ open Utils;
 // like the slicing and whatnot
 
 // I think like this, chunks can be quite tall, 16*16*256 = 65536 blocks
-// Number of chunks is max int^2, * 16 blocks
+// If I have max int chunks, sqrt of that is world size
 // Player coordinates is a double
 // I think that's quite a lot larger than minecraft
 
 // In 64bit OCaml the maximums are:
 // Int: 4611686018427387903 4.6 quintillion
-// Float: 1.79769313486e+308 WAYY larger than max int
+// Float: 1.79769313486e+308 won't even have accuracy issues
 
 // sqrt of max int is 2147483648 2.14bn same as max cash in osrs
 // The world could be 34359738368 or 34bn blocks along a side
@@ -78,8 +78,21 @@ let setup = () => {
   };
 };
 
-let draw_offset_block = (offset, b, block) => {
-  let position = Vector3.add(index_to_3d_coord(b), offset);
+let draw_chunk_borders = cv => {
+  // This chunk border draws in the wrong place relative
+  // to the blocks in the chunk, this might bite me in future
+  let position = Vector3.add(cv, Vector3.create(3.5, 1., 3.5));
+  draw_cube_wires(
+    position,
+    float_of_int(chunkSize),
+    float_of_int(chunkHeight),
+    float_of_int(chunkSize),
+    Color.maroon,
+  );
+};
+
+let draw_offset_block = (origin, b, block) => {
+  let position = Vector3.add(index_to_3d_coord(b), origin);
   switch (Block.get_block_colour(block)) {
   | None => ()
   | Some(blockColour) => draw_cube(position, 1., 1., 1., blockColour)
@@ -91,11 +104,11 @@ let draw_all = state => {
   clear_background(Color.raywhite);
   begin_mode_3d(state.camera);
   List.iter(
-    ci =>
-      Array.iteri(
-        draw_offset_block(index_to_2d_coord(ci)),
-        get_chunk_at_index(ci),
-      ),
+    ci => {
+      let chunkOrigin = index_to_2d_coord(ci);
+      draw_chunk_borders(chunkOrigin);
+      Array.iteri(draw_offset_block(chunkOrigin), get_chunk_at_index(ci));
+    },
     state.activeChunks,
   );
 
