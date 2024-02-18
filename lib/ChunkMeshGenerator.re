@@ -1,5 +1,7 @@
 open Constants;
 
+// Because blocks are a 1d array this will select
+// blocks that are wrapped, on the other side of the chunk
 let get_block_neighbor_ids = b => {
   (
     b - 1,

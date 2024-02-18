@@ -25,9 +25,9 @@ let index_to_2d_vec = ci => {
 // This allows generation into negative negative, but not into
 // negative positive, or positive negative, because world is
 // 1D transformed into 2D so it fills only half the graph.
+//
 // I might need to switch to a real 2D system to generate in
-// all directions.
-// So I'm disabling it by clamping above zero
+// all directions. So I'm disabling it by clamping above zero
 let clamp_index_opt = i =>
   switch (i) {
   // | n when n <= - (worldSizeInChunks * worldSizeInChunks) => None
@@ -77,12 +77,3 @@ let get_active_chunks_ids = (pos: Vector3.t) => {
        }
      );
 };
-
-// let get_active_chunks_coords = (pos: Vector3.t) => {
-//   let (x, z) = (
-//     (Vector3.x(pos) |> floor |> int_of_float) / chunkSize,
-//     (Vector3.z(pos) |> floor |> int_of_float) / chunkSize,
-//   );
-// };
-
-();

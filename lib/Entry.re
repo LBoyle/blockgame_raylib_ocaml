@@ -2,32 +2,6 @@ open Raylib;
 open Constants;
 open Utils;
 
-// When we decide a chunk is "active" we will check the cache for it,
-// if missing then we'll generate one and update the cache
-// ChunkCache.find (Map.find), will raise Not_found if the chunk is missing
-
-// So I'm using chunk indexes for 2d coords at low resolution
-// then each chunk has a separate array of blocks with 3d coords
-// This is all in a global ref dictionary with the chunk index as the key
-
-// An alternative might be a flat Bigarray Int8U or Int16U with offsets
-// but I'm not so confident converting an index to a 4d coord
-// However this would provide some very performant ways to do things
-// like the slicing and whatnot
-
-// I think like this, chunks can be quite tall, 16*16*256 = 65536 blocks
-// If I have max int chunks, sqrt of that is world size
-// Player coordinates is a double
-// I think that's quite a lot larger than minecraft
-
-// In 64bit OCaml the maximums are:
-// Int: 4611686018427387903 4.6 quintillion
-// Float: 1.79769313486e+308 won't even have accuracy issues
-
-// sqrt of max int is 2147483648 2.14bn same as max cash in osrs
-// The world could be 34359738368 or 34bn blocks along a side
-// That would be 3.022314549e+23 blocks in a world
-
 module ChunkCache =
   Map.Make({
     type t = int;
@@ -56,6 +30,8 @@ type state_t = {
   playerPosition: Vector3.t,
 };
 
+// Instead of spawing in the middle with an offset
+// I should generate correctly in all 4 directions
 // let worldSizeOffsetVec =
 //   Vector3.create(
 //     float_of_int(worldSizeInChunks / 2 * chunkSize),
@@ -127,6 +103,7 @@ let draw_all = state => {
     ci => {
       let chunkOrigin = index_to_2d_vec(ci);
       draw_chunk_borders(chunkOrigin);
+      // Drawing blocks is no good at scale, gotta do meshes
       Array.iteri(draw_offset_block(chunkOrigin), get_chunk_at_index(ci));
       ();
     },
@@ -137,15 +114,19 @@ let draw_all = state => {
 
   let printablePosition =
     Vector3.subtract(state.playerPosition, worldSizeOffsetVec);
-  let positionText =
+  draw_text(
     "x, z : ("
     ++ Printf.sprintf("%.2f", Vector3.x(printablePosition))
     ++ ", "
     ++ Printf.sprintf("%.2f", Vector3.z(printablePosition))
-    ++ ")";
-  draw_text(positionText, 20, 20, 20, Color.black);
-  let fps = get_fps() |> string_of_int;
-  draw_text("fps: " ++ fps, 20, 50, 20, Color.black);
+    ++ ")",
+    20,
+    20,
+    20,
+    Color.black,
+  );
+
+  draw_text("fps: " ++ (get_fps() |> string_of_int), 20, 50, 20, Color.black);
 
   end_drawing();
 };
@@ -154,6 +135,8 @@ let rec loop = state => {
   let state =
     if (window_should_close()) {
       chunk_cache := ChunkCache.empty;
+      Noise.gradient_cache_1 := Noise.NoiseCache.empty;
+      Noise.noise_cache_1 := Noise.NoiseCache.empty;
       close_window();
       state;
     } else {
