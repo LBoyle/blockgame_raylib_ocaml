@@ -28,16 +28,15 @@ module ChunkCache =
     let hash = Hashtbl.hash;
   });
 
-let chunk_cache: ref(ChunkCache.t(array(Block.t))) =
-  ref(ChunkCache.create(0));
+let chunk_cache: ChunkCache.t(array(Block.t)) = ChunkCache.create(0);
 
 let get_chunk_at_index = i => {
-  switch (ChunkCache.find(chunk_cache^, i)) {
+  switch (ChunkCache.find(chunk_cache, i)) {
   | exception _exn =>
     generate_chunk(i)
     |> (
       chunk => {
-        ChunkCache.add(chunk_cache^, i, chunk);
+        ChunkCache.add(chunk_cache, i, chunk);
         chunk;
       }
     )

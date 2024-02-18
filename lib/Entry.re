@@ -115,10 +115,10 @@ let draw_all = state => {
 let rec loop = state => {
   let state =
     if (window_should_close()) {
-      World.chunk_cache := World.ChunkCache.create(0);
-      Chunk.mesh_cache := Chunk.MeshCache.create(0);
-      Noise.gradient_cache_1 := Noise.NoiseCache.create(0);
-      Noise.noise_cache_1 := Noise.NoiseCache.create(0);
+      World.ChunkCache.reset(World.chunk_cache);
+      Noise.NoiseCache.reset(Noise.gradient_cache_1);
+      Noise.NoiseCache.reset(Noise.noise_cache_1);
+      Chunk.MeshCache.reset(Chunk.mesh_cache);
       close_window();
       state;
     } else {

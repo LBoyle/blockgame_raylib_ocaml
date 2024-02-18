@@ -31,10 +31,10 @@ module MeshCache =
 //     let compare = compare;
 //   });
 
-let mesh_cache: ref(MeshCache.t(Raylib.Mesh.t)) = ref(MeshCache.create(0));
+let mesh_cache: MeshCache.t(Raylib.Mesh.t) = MeshCache.create(0);
 
 let get_mesh_for_chunk_at_index = i => {
-  switch (MeshCache.find(mesh_cache^, i)) {
+  switch (MeshCache.find(mesh_cache, i)) {
   | exception _exn => ()
   | _chunkmesh => ()
   };
