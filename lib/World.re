@@ -22,20 +22,22 @@ let generate_chunk = ci => {
 };
 
 module ChunkCache =
-  Map.Make({
+  Hashtbl.Make({
     type t = int;
-    let compare = compare;
+    let equal = (==);
+    let hash = Hashtbl.hash;
   });
 
-let chunk_cache: ref(ChunkCache.t(array(Block.t))) = ref(ChunkCache.empty);
+let chunk_cache: ref(ChunkCache.t(array(Block.t))) =
+  ref(ChunkCache.create(0));
 
 let get_chunk_at_index = i => {
-  switch (ChunkCache.find(i, chunk_cache^)) {
+  switch (ChunkCache.find(chunk_cache^, i)) {
   | exception _exn =>
     generate_chunk(i)
     |> (
       chunk => {
-        chunk_cache := ChunkCache.add(i, chunk, chunk_cache^);
+        ChunkCache.add(chunk_cache^, i, chunk);
         chunk;
       }
     )
