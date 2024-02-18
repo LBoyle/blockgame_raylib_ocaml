@@ -56,6 +56,14 @@ type state_t = {
   playerPosition: Vector3.t,
 };
 
+// let worldSizeOffsetVec =
+//   Vector3.create(
+//     float_of_int(worldSizeInChunks / 2 * chunkSize),
+//     0.,
+//     float_of_int(worldSizeInChunks / 2 * chunkSize),
+//   );
+let worldSizeOffsetVec = Vector3.create(0., 0., 0.);
+
 let startingPosition = Vector3.create(4., 6., 4.);
 
 let setup = () => {
@@ -64,24 +72,34 @@ let setup = () => {
   disable_cursor();
   set_target_fps(60);
 
+  Random.full_init(world_seed_arr);
+
   {
     camera:
       Camera.create(
-        startingPosition,
+        Vector3.add(startingPosition, worldSizeOffsetVec),
         Vector3.create(0., 3., 0.),
         Vector3.create(0., 3., 0.),
         80.,
         CameraProjection.Perspective,
       ),
     activeChunks: get_active_chunks_ids(startingPosition),
-    playerPosition: startingPosition,
+    playerPosition: Vector3.add(startingPosition, worldSizeOffsetVec),
   };
 };
 
 let draw_chunk_borders = cv => {
   // This chunk border draws in the wrong place relative
   // to the blocks in the chunk, this might bite me in future
-  let position = Vector3.add(cv, Vector3.create(3.5, 1., 3.5));
+  let position =
+    Vector3.add(
+      cv,
+      Vector3.create(
+        float_of_int(chunkSize / 2) -. 0.5,
+        float_of_int(chunkHeight / 2) -. 0.5,
+        float_of_int(chunkSize / 2) -. 0.5,
+      ),
+    );
   draw_cube_wires(
     position,
     float_of_int(chunkSize),
@@ -92,7 +110,7 @@ let draw_chunk_borders = cv => {
 };
 
 let draw_offset_block = (origin, b, block) => {
-  let position = Vector3.add(index_to_3d_coord(b), origin);
+  let position = Vector3.add(index_to_3d_vec(b), origin);
   switch (Block.get_block_colour(block)) {
   | None => ()
   | Some(blockColour) => draw_cube(position, 1., 1., 1., blockColour)
@@ -105,14 +123,28 @@ let draw_all = state => {
   begin_mode_3d(state.camera);
   List.iter(
     ci => {
-      let chunkOrigin = index_to_2d_coord(ci);
+      let chunkOrigin = index_to_2d_vec(ci);
       draw_chunk_borders(chunkOrigin);
       Array.iteri(draw_offset_block(chunkOrigin), get_chunk_at_index(ci));
+      ();
     },
     state.activeChunks,
   );
 
   end_mode_3d();
+
+  let printablePosition =
+    Vector3.subtract(state.playerPosition, worldSizeOffsetVec);
+  let positionText =
+    "x, z : ("
+    ++ Printf.sprintf("%.2f", Vector3.x(printablePosition))
+    ++ ", "
+    ++ Printf.sprintf("%.2f", Vector3.z(printablePosition))
+    ++ ")";
+  draw_text(positionText, 20, 20, 20, Color.black);
+  let fps = get_fps() |> string_of_int;
+  draw_text("fps: " ++ fps, 20, 50, 20, Color.black);
+
   end_drawing();
 };
 

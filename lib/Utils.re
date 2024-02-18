@@ -1,23 +1,37 @@
 open Raylib;
 open Constants;
 
-let index_to_3d_coord = b =>
-  Vector3.create(
-    float_of_int(b mod chunkSize),
-    float_of_int(b / (chunkSize * chunkSize)),
-    float_of_int(b / chunkSize mod chunkSize),
-  );
+let index_to_3d_coord = b => (
+  float_of_int(b mod chunkSize),
+  float_of_int(b / (chunkSize * chunkSize)),
+  float_of_int(b / chunkSize mod chunkSize),
+);
 
-let index_to_2d_coord = ci =>
-  Vector3.create(
-    float_of_int(ci mod worldSizeInChunks * chunkSize),
-    0.,
-    float_of_int(ci / worldSizeInChunks * chunkSize),
-  );
+let index_to_3d_vec = b => {
+  let (x, y, z) = index_to_3d_coord(b);
+  Vector3.create(x, y, z);
+};
 
+let index_to_2d_coord = ci => (
+  float_of_int(ci mod worldSizeInChunks * chunkSize),
+  float_of_int(ci / worldSizeInChunks * chunkSize),
+);
+
+let index_to_2d_vec = ci => {
+  let (x, z) = index_to_2d_coord(ci);
+  Vector3.create(x, 0., z);
+};
+
+// This allows generation into negative negative, but not into
+// negative positive, or positive negative, because world is
+// 1D transformed into 2D so it fills only half the graph.
+// I might need to switch to a real 2D system to generate in
+// all directions.
+// So I'm disabling it by clamping above zero
 let clamp_index_opt = i =>
   switch (i) {
-  | n when n <= - (worldSizeInChunks * worldSizeInChunks) => None
+  // | n when n <= - (worldSizeInChunks * worldSizeInChunks) => None
+  | n when n < 0 => None
   | n when n >= worldSizeInChunks * worldSizeInChunks => None
   | n => Some(n)
   };
@@ -63,3 +77,12 @@ let get_active_chunks_ids = (pos: Vector3.t) => {
        }
      );
 };
+
+// let get_active_chunks_coords = (pos: Vector3.t) => {
+//   let (x, z) = (
+//     (Vector3.x(pos) |> floor |> int_of_float) / chunkSize,
+//     (Vector3.z(pos) |> floor |> int_of_float) / chunkSize,
+//   );
+// };
+
+();

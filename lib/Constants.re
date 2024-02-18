@@ -1,10 +1,12 @@
-let worldSizeInChunks = 100;
+let worldSizeInChunks = 10;
 
 let viewDistanceInChunks = 3;
 
-let chunkSize = 8;
-let chunkHeight = 3;
+let chunkSize = 16;
+let chunkHeight = 6;
 let vhWidth = 1920;
 let vhHeight = 1080;
 
 let moveSpeed = 8.;
+
+let world_seed_arr = [|3, 2, 4, 3, 3, 1, 5, 2|];
