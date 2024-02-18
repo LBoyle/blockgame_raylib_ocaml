@@ -17,3 +17,18 @@ let gen_chunk_mesh = (_ci: int, _chunk: array(Block.t)) => {
   ();
   ();
 };
+
+module MeshCache =
+  Map.Make({
+    type t = int;
+    let compare = compare;
+  });
+
+let mesh_cache: ref(MeshCache.t(Raylib.Mesh.t)) = ref(MeshCache.empty);
+
+let get_mesh_for_chunk_at_index = i => {
+  switch (MeshCache.find(i, mesh_cache^)) {
+  | exception _exn => ()
+  | _chunkmesh => ()
+  };
+};

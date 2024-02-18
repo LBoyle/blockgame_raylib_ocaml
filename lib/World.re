@@ -20,3 +20,25 @@ let generate_chunk = ci => {
   Array.make(chunkSize * chunkSize * chunkHeight, Block.Air)
   |> Array.mapi((i, _air) => genBlock(ci, Utils.index_to_3d_coord(i)));
 };
+
+module ChunkCache =
+  Map.Make({
+    type t = int;
+    let compare = compare;
+  });
+
+let chunk_cache: ref(ChunkCache.t(array(Block.t))) = ref(ChunkCache.empty);
+
+let get_chunk_at_index = i => {
+  switch (ChunkCache.find(i, chunk_cache^)) {
+  | exception _exn =>
+    generate_chunk(i)
+    |> (
+      chunk => {
+        chunk_cache := ChunkCache.add(i, chunk, chunk_cache^);
+        chunk;
+      }
+    )
+  | chunk => chunk
+  };
+};

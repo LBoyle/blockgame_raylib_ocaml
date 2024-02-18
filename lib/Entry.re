@@ -2,28 +2,6 @@ open Raylib;
 open Constants;
 open Utils;
 
-module ChunkCache =
-  Map.Make({
-    type t = int;
-    let compare = compare;
-  });
-
-let chunk_cache: ref(ChunkCache.t(array(Block.t))) = ref(ChunkCache.empty);
-
-let get_chunk_at_index = i => {
-  switch (ChunkCache.find(i, chunk_cache^)) {
-  | exception _exn =>
-    World.generate_chunk(i)
-    |> (
-      chunk => {
-        chunk_cache := ChunkCache.add(i, chunk, chunk_cache^);
-        chunk;
-      }
-    )
-  | chunk => chunk
-  };
-};
-
 type state_t = {
   camera: Camera3D.t,
   activeChunks: list(int),
@@ -104,7 +82,10 @@ let draw_all = state => {
       let chunkOrigin = index_to_2d_vec(ci);
       draw_chunk_borders(chunkOrigin);
       // Drawing blocks is no good at scale, gotta do meshes
-      Array.iteri(draw_offset_block(chunkOrigin), get_chunk_at_index(ci));
+      Array.iteri(
+        draw_offset_block(chunkOrigin),
+        World.get_chunk_at_index(ci),
+      );
       ();
     },
     state.activeChunks,
@@ -134,7 +115,8 @@ let draw_all = state => {
 let rec loop = state => {
   let state =
     if (window_should_close()) {
-      chunk_cache := ChunkCache.empty;
+      World.chunk_cache := World.ChunkCache.empty;
+      Chunk.mesh_cache := Chunk.MeshCache.empty;
       Noise.gradient_cache_1 := Noise.NoiseCache.empty;
       Noise.noise_cache_1 := Noise.NoiseCache.empty;
       close_window();
