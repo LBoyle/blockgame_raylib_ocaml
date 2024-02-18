@@ -3,7 +3,7 @@ let worldSizeInChunks = 10;
 let viewDistanceInChunks = 3;
 
 let chunkSize = 16;
-let chunkHeight = 6;
+let chunkHeight = 20;
 let vhWidth = 1920;
 let vhHeight = 1080;
 

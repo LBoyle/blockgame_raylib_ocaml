@@ -64,7 +64,7 @@ type state_t = {
 //   );
 let worldSizeOffsetVec = Vector3.create(0., 0., 0.);
 
-let startingPosition = Vector3.create(4., 6., 4.);
+let startingPosition = Vector3.create(4., 18., 4.);
 
 let setup = () => {
   init_window(vhWidth, vhHeight, "blockgame");
@@ -113,7 +113,9 @@ let draw_offset_block = (origin, b, block) => {
   let position = Vector3.add(index_to_3d_vec(b), origin);
   switch (Block.get_block_colour(block)) {
   | None => ()
-  | Some(blockColour) => draw_cube(position, 1., 1., 1., blockColour)
+  | Some(blockColour) =>
+    draw_cube(position, 1., 1., 1., blockColour);
+    draw_cube_wires(position, 1., 1., 1., Color.maroon);
   };
 };
 
