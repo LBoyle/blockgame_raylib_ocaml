@@ -44,6 +44,13 @@ Note that the Diskuv OCaml (DKML) installer does not yet support OCaml 5.0.0, th
 
 I will have to work this out eventually for production builds, though it might actually be easier to cross-compile for Windows instead 
 
+## Text Editor 
+
+The only requirement is ocaml-lsp-server, I know this works for Vim and Emacs though I haven't tried it
+
+It's easiest with VSCode, I use VSCodium, with the ocaml-platform plugin, you might need to run `eval $(opam env)` 
+and `dune build -w` before the syntax highlighting will work correctly 
+
 ## Tech choices
 
 #### ReasonML (OCaml)
