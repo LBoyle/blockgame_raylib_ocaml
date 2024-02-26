@@ -5,9 +5,9 @@ description: "A block-game"
 maintainer: ["lboyle@protonmail.com"]
 authors: ["LBoyle"]
 license: "LICENSE"
-tags: ["ReasonML" "Raylib" "2D" "Block Game"]
-homepage: "https://github.com/LBoyle/blockgame_raylib"
-bug-reports: "https://github.com/LBoyle/blockgame_raylib/issues"
+tags: ["ReasonML" "Raylib" "3D" "Block Game"]
+homepage: "https://github.com/LBoyle/blockgame_raylib_ocaml"
+bug-reports: "https://github.com/LBoyle/blockgame_raylib_ocaml/issues"
 depends: [
   "ocaml"
   "dune" {>= "3.10"}
@@ -29,4 +29,4 @@ build: [
     "@doc" {with-doc}
   ]
 ]
-dev-repo: "git+https://github.com/LBoyle/blockgame_raylib.git"
+dev-repo: "git+https://github.com/LBoyle/blockgame_raylib_ocaml.git"

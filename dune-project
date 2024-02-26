@@ -5,7 +5,7 @@
 (generate_opam_files true)
 
 (source
- (github LBoyle/blockgame_raylib))
+ (github LBoyle/blockgame_raylib_ocaml))
 
 (authors "LBoyle")
 
@@ -19,4 +19,4 @@
  (description "A block-game")
  (depends ocaml dune raylib raygui)
  (tags
-  ("ReasonML" "Raylib" "2D" "Block Game")))
+  ("ReasonML" "Raylib" "3D" "Block Game")))
