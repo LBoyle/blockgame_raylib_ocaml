@@ -77,5 +77,4 @@ Drawbacks of this are that it's OpenGL and doesn't support Vulcan, and I can't u
 
 #### The ideal tech
 
-I want to see a nice high-level library like Raylib that abstracts the really complex stuff, and can target Windows, Mac(nice to have), Linux and WebAssembly. Maybe even 
-
+I want to see a nice high-level library like Raylib that abstracts the really complex stuff, and can target Windows, Mac, Linux and WebAssembly, for OCaml so I can use it to make games 
