@@ -48,8 +48,8 @@ I will have to work this out eventually for production builds, though it might a
 
 The only requirement is ocaml-lsp-server, I know this works for Vim and Emacs though I haven't tried it
 
-It's easiest with VSCode, I use VSCodium, with the ocaml-platform plugin, you might need to run `eval $(opam env)` 
-and `dune build -w` before the syntax highlighting will work correctly 
+It's easiest with VSCode or VSCodium with the ocaml-platform plugin, you might need to run `eval $(opam env)` 
+and `dune build -w` before opening the editor for the syntax highlighting will work correctly 
 
 ## Tech choices
 
