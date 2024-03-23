@@ -80,9 +80,9 @@ let draw_all = state => {
       //   draw_offset_block(chunk_origin),
       //   World.get_chunk_at_index(ci),
       // );
-      switch (Chunk.get_mesh_for_chunk_at_index(ci)) {
-      | exception _exn => ()
-      | chunk_mesh =>
+      switch (Chunk.get_mesh_for_chunk_opt(ci)) {
+      | None => ()
+      | Some(chunk_mesh) =>
         let chunk_model = load_model_from_mesh(chunk_mesh);
 
         draw_model_wires(chunk_model, chunk_origin, 1.0, Color.maroon);
@@ -127,7 +127,8 @@ let rec loop = state => {
       World.ChunkCache.reset(World.chunk_cache);
       Noise.NoiseCache.reset(Noise.gradient_cache_1);
       Noise.NoiseCache.reset(Noise.noise_cache_1);
-      Chunk.unload_chunk_meshes();
+      // Chunk.unload_chunk_meshes(); // This seems to be handled by GC
+      Chunk.MeshCache.reset(Chunk.mesh_cache);
       close_window();
       state;
     } else {
@@ -138,10 +139,12 @@ let rec loop = state => {
         Vector3.create(
           (is_key_down(Key.S) ? 0. : mv) -. (is_key_down(Key.W) ? 0. : mv),
           (is_key_down(Key.A) ? 0. : mv) -. (is_key_down(Key.D) ? 0. : mv),
-          0.,
+          (is_key_down(Key.Left_control) ? 0. : mv)
+          -. (is_key_down(Key.Space) ? 0. : mv),
         );
+
       update_camera_pro(
-        addr(state.camera), // pointer
+        addr(state.camera),
         playerMovement,
         Vector3.create(
           Vector2.x(get_mouse_delta()) *. 0.5,
@@ -151,11 +154,13 @@ let rec loop = state => {
         0.,
       );
       let playerPosition = Camera3D.position(state.camera);
-      {
-        ...state,
-        activeChunks: get_active_chunks_ids(playerPosition),
-        playerPosition,
-      };
+      let updated_active_chunks = get_active_chunks_ids(playerPosition);
+      let _ =
+        List.iter(
+          ci => Chunk.generate_mesh_side_effect(ci),
+          updated_active_chunks,
+        );
+      {...state, activeChunks: updated_active_chunks, playerPosition};
     };
   draw_all(state);
   loop(state);

@@ -231,28 +231,32 @@ module MeshCache =
 
 let mesh_cache: MeshCache.t(Mesh.t) = MeshCache.create(0);
 
-// let get_mesh_for_chunk_opt = ci =>
-//   switch (MeshCache.find(mesh_cache, ci)) {
-//   | exception _exn => None
-//   | chunk_mesh => Some(chunk_mesh)
-//   };
+let get_mesh_for_chunk_opt = ci =>
+  switch (MeshCache.find(mesh_cache, ci)) {
+  | exception _exn => None
+  | chunk_mesh => Some(chunk_mesh)
+  };
 
-// let generate_mesh_side_effect = ci =>
-//   switch (World.get_chunk_at_index_opt(ci)) {
-//   | None => ()
-//   | Some(chunk) =>
-//     switch (MeshCache.find(mesh_cache, ci)) {
-//     | exception _exn =>
-//       let chunk_mesh = gen_chunk_mesh(ci, chunk);
-//       upload_mesh(addr(chunk_mesh), false);
-//       MeshCache.add(mesh_cache, ci, chunk_mesh);
-//     | old_mesh =>
-//       let chunk_mesh = gen_chunk_mesh(ci, chunk);
-//       upload_mesh(addr(chunk_mesh), false);
-//       MeshCache.replace(mesh_cache, ci, chunk_mesh);
-//       unload_mesh(old_mesh);
-//     }
-//   };
+let generate_mesh_side_effect = ci =>
+  switch (World.get_chunk_at_index(ci)) {
+  | exception _exn => ()
+  | chunk =>
+    switch (MeshCache.find(mesh_cache, ci)) {
+    | exception _exn =>
+      print_endline("Generating chunk " ++ string_of_int(ci));
+      let chunk_mesh = gen_chunk_mesh(ci, chunk);
+      print_endline("Uploading mesh " ++ string_of_int(ci));
+      upload_mesh(addr(chunk_mesh), false);
+      print_endline("Caching mesh " ++ string_of_int(ci));
+      MeshCache.add(mesh_cache, ci, chunk_mesh);
+    | _old_mesh =>
+      // let chunk_mesh = gen_chunk_mesh(ci, chunk);
+      // upload_mesh(addr(chunk_mesh), false);
+      // MeshCache.replace(mesh_cache, ci, chunk_mesh);
+      // unload_mesh(old_mesh);
+      ()
+    }
+  };
 
 let get_mesh_for_chunk_at_index = ci => {
   switch (MeshCache.find(mesh_cache, ci)) {
@@ -270,4 +274,29 @@ let get_mesh_for_chunk_at_index = ci => {
 let unload_chunk_meshes = () => {
   MeshCache.iter((_, mesh) => unload_mesh(mesh), mesh_cache);
   MeshCache.reset(mesh_cache);
+};
+
+let clear_chunks_from_vram = (chunks_to_clear: list(int)) => {
+  chunks_to_clear
+  |> List.iter(ci => {
+       switch (MeshCache.find(mesh_cache, ci)) {
+       | chunk_mesh =>
+         print_newline();
+         print_endline(
+           "attempting to unload chunk with id: " ++ string_of_int(ci),
+         );
+
+         switch (unload_mesh(chunk_mesh)) {
+         | exception exn =>
+           print_newline();
+           print_endline(
+             "Failed to unload mesh with id " ++ string_of_int(ci),
+           );
+           print_endline(Printexc.to_string(exn));
+         | _res =>
+           print_endline("Unloaded mesh with id " ++ string_of_int(ci))
+         };
+       | exception _exn => ()
+       }
+     });
 };
