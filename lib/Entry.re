@@ -16,7 +16,7 @@ let setup = () => {
   init_window(vhWidth, vhHeight, "blockgame");
 
   disable_cursor();
-  // set_target_fps(60);
+  set_target_fps(60);
 
   Random.full_init(world_seed_arr);
   {
@@ -62,6 +62,11 @@ let draw_offset_block = (origin, b, block) => {
   };
 };
 
+let block_position_1 = Vector3.create(0., 0., 0.);
+let block_position_2 = Vector3.create(2., 0., 0.);
+let block_position_3 = Vector3.create(0., 0., 2.);
+let block_position_4 = Vector3.create(0., 2., 0.);
+
 let draw_all = state => {
   begin_drawing();
   clear_background(Color.raywhite);
@@ -90,6 +95,11 @@ let draw_all = state => {
     state.activeChunks,
   );
 
+  draw_cube(block_position_1, 1., 1., 1., Color.red);
+  draw_cube(block_position_2, 1., 1., 1., Color.green);
+  draw_cube(block_position_3, 1., 1., 1., Color.blue);
+  draw_cube(block_position_4, 1., 1., 1., Color.brown);
+
   end_mode_3d();
 
   let printablePosition =
@@ -117,7 +127,7 @@ let rec loop = state => {
       World.ChunkCache.reset(World.chunk_cache);
       Noise.NoiseCache.reset(Noise.gradient_cache_1);
       Noise.NoiseCache.reset(Noise.noise_cache_1);
-      Chunk.MeshCache.reset(Chunk.mesh_cache);
+      Chunk.unload_chunk_meshes();
       close_window();
       state;
     } else {

@@ -1,4 +1,4 @@
-let worldSizeInChunks = 10;
+let worldSizeInChunks = 1;
 
 let viewDistanceInChunks = 3;
 

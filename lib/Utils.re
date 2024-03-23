@@ -3,8 +3,8 @@ open Constants;
 
 let array_get_opt = (i, arr) =>
   switch (arr[i]) {
-  | exception _exn => None
   | item => Some(item)
+  | exception _exn => None
   };
 
 let index_to_3d_coord = b => (

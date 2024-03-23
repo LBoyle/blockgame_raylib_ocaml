@@ -38,6 +38,7 @@ let chunk_cache: ChunkCache.t(array(Block.t)) = ChunkCache.create(0);
 
 let get_chunk_at_index = i => {
   switch (ChunkCache.find(chunk_cache, i)) {
+  | chunk => chunk
   | exception _exn =>
     generate_chunk(i)
     |> (
@@ -46,6 +47,5 @@ let get_chunk_at_index = i => {
         chunk;
       }
     )
-  | chunk => chunk
   };
 };

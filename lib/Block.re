@@ -4,6 +4,7 @@ type t =
   | Stone
   | Grass
   | Water;
+
 let get_block_colour = block =>
   switch (block) {
   | Air => None
