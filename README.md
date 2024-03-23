@@ -48,8 +48,8 @@ I will have to work this out eventually for production builds, though it might a
 
 The only requirement is ocaml-lsp-server, I know this works for Vim and Emacs though I haven't tried it
 
-It's easiest with VSCode, I use VSCodium, with the ocaml-platform plugin, you might need to run `eval $(opam env)` 
-and `dune build -w` before the syntax highlighting will work correctly 
+It's easiest with VSCode or VSCodium with the ocaml-platform plugin, you might need to run `eval $(opam env)` 
+and `dune build -w` before opening the editor for the syntax highlighting will work correctly 
 
 ## Tech choices
 
@@ -77,5 +77,4 @@ Drawbacks of this are that it's OpenGL and doesn't support Vulcan, and I can't u
 
 #### The ideal tech
 
-I want to see a nice high-level library like Raylib that abstracts the really complex stuff, and can target Windows, Mac(nice to have), Linux and WebAssembly. Maybe even 
-
+I want to see a nice high-level library like Raylib that abstracts the really complex stuff, and can target Windows, Mac, Linux and WebAssembly, for OCaml so I can use it to make games 
