@@ -8,14 +8,6 @@ type state_t = {
   playerPosition: Vector3.t,
 };
 
-// Instead of spawing in the middle with an offset
-// I should generate correctly in all 4 directions
-// let worldSizeOffsetVec =
-//   Vector3.create(
-//     float_of_int(worldSizeInChunks / 2 * chunkSize),
-//     0.,
-//     float_of_int(worldSizeInChunks / 2 * chunkSize),
-//   );
 let worldSizeOffsetVec = Vector3.create(0., 0., 0.);
 
 let startingPosition = Vector3.create(4., 18., 4.);
@@ -24,10 +16,9 @@ let setup = () => {
   init_window(vhWidth, vhHeight, "blockgame");
 
   disable_cursor();
-  set_target_fps(60);
+  // set_target_fps(60);
 
   Random.full_init(world_seed_arr);
-
   {
     camera:
       Camera.create(
@@ -79,13 +70,23 @@ let draw_all = state => {
   begin_mode_3d(state.camera);
   List.iter(
     ci => {
-      let chunkOrigin = index_to_2d_vec(ci);
-      draw_chunk_borders(chunkOrigin);
+      let chunk_origin = index_to_2d_vec(ci);
+      draw_chunk_borders(chunk_origin);
       // Drawing blocks is no good at scale, gotta do meshes
-      Array.iteri(
-        draw_offset_block(chunkOrigin),
-        World.get_chunk_at_index(ci),
-      );
+      // Array.iteri(
+      //   draw_offset_block(chunk_origin),
+      //   World.get_chunk_at_index(ci),
+      // );
+      switch (Chunk.get_mesh_for_chunk_at_index(ci)) {
+      | exception _exn => ()
+      | chunk_mesh =>
+        let chunk_model = load_model_from_mesh(chunk_mesh);
+
+        draw_model_wires(chunk_model, chunk_origin, 1.0, Color.maroon);
+
+        ();
+      };
+
       ();
     },
     state.activeChunks,

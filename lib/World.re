@@ -30,6 +30,12 @@ module ChunkCache =
 
 let chunk_cache: ChunkCache.t(array(Block.t)) = ChunkCache.create(0);
 
+// let get_chunk_at_index_opt = i =>
+//   switch (ChunkCache.find(chunk_cache, i)) {
+//   | exception _exn => None
+//   | chunk => Some(chunk)
+//   };
+
 let get_chunk_at_index = i => {
   switch (ChunkCache.find(chunk_cache, i)) {
   | exception _exn =>

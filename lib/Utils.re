@@ -1,6 +1,12 @@
 open Raylib;
 open Constants;
 
+let array_get_opt = (i, arr) =>
+  switch (arr[i]) {
+  | exception _exn => None
+  | item => Some(item)
+  };
+
 let index_to_3d_coord = b => (
   float_of_int(b mod chunkSize),
   float_of_int(b / (chunkSize * chunkSize)),
