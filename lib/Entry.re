@@ -34,15 +34,13 @@ let setup = () => {
 };
 
 let draw_chunk_borders = cv => {
-  // This chunk border draws in the wrong place relative
-  // to the blocks in the chunk, this might bite me in future
   let position =
     Vector3.add(
       cv,
       Vector3.create(
-        float_of_int(chunkSize / 2) -. 0.5,
-        float_of_int(chunkHeight / 2) -. 0.5,
-        float_of_int(chunkSize / 2) -. 0.5,
+        float_of_int(chunkSize / 2),
+        float_of_int(chunkHeight / 2),
+        float_of_int(chunkSize / 2),
       ),
     );
   draw_cube_wires(

@@ -124,21 +124,33 @@ let gen_chunk_mesh = (_ci: int, chunk: array(Block.t)) => {
   // This is not correct
   let flat_verts_array =
     List.flatten(verts)
+    // For each face
     |> List.map(((v1, v2, v3, v4)) =>
          [
-           Vector3.x(v1),
-           Vector3.y(v1),
-           Vector3.z(v1),
-           Vector3.x(v2),
-           Vector3.y(v2),
-           Vector3.z(v2),
-           Vector3.x(v3),
-           Vector3.y(v3),
-           Vector3.z(v3),
-           Vector3.x(v4),
-           Vector3.y(v4),
-           Vector3.z(v4),
+           [
+             Vector3.x(v1),
+             Vector3.y(v1),
+             Vector3.z(v1),
+             Vector3.x(v2),
+             Vector3.y(v2),
+             Vector3.z(v2),
+             Vector3.x(v3),
+             Vector3.y(v3),
+             Vector3.z(v3),
+           ],
+           [
+             Vector3.x(v1),
+             Vector3.y(v1),
+             Vector3.z(v1),
+             Vector3.x(v4),
+             Vector3.y(v4),
+             Vector3.z(v4),
+             Vector3.x(v3),
+             Vector3.y(v3),
+             Vector3.z(v3),
+           ],
          ]
+         |> List.flatten
        )
     |> List.flatten;
 
