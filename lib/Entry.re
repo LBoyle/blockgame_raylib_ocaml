@@ -16,7 +16,7 @@ let setup = () => {
   init_window(vhWidth, vhHeight, "blockgame");
 
   disable_cursor();
-  set_target_fps(60);
+  // set_target_fps(60);
 
   Random.full_init(world_seed_arr);
   {

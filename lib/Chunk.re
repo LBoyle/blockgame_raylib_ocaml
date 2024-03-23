@@ -25,12 +25,12 @@ type normal_face_vert_t =
   | Right(face_verts_t);
 
 let get_exposed_block_face_verts = (b, chunk: array(Block.t)) => {
-  let (behind, ahead, right, left, below, above) = get_block_neighbor_ids(b);
-  let (behind, ahead, right, left, below, above) = (
+  let (behind, ahead, left, right, below, above) = get_block_neighbor_ids(b);
+  let (behind, ahead, left, right, below, above) = (
     Utils.array_get_opt(behind, chunk),
     Utils.array_get_opt(ahead, chunk),
-    Utils.array_get_opt(right, chunk),
     Utils.array_get_opt(left, chunk),
+    Utils.array_get_opt(right, chunk),
     Utils.array_get_opt(below, chunk),
     Utils.array_get_opt(above, chunk),
   );
@@ -39,10 +39,10 @@ let get_exposed_block_face_verts = (b, chunk: array(Block.t)) => {
     if (behind == Some(Air)) {
       Some(
         Behind((
+          Vector3.create(x, y +. 1., z),
           Vector3.create(x, y, z),
           Vector3.create(x, y, z +. 1.),
           Vector3.create(x, y +. 1., z +. 1.),
-          Vector3.create(x, y +. 1., z),
         )),
       );
     } else {
@@ -53,9 +53,9 @@ let get_exposed_block_face_verts = (b, chunk: array(Block.t)) => {
       Some(
         InFront((
           Vector3.create(x +. 1., y, z),
-          Vector3.create(x +. 1., y, z +. 1.),
-          Vector3.create(x +. 1., y +. 1., z +. 1.),
           Vector3.create(x +. 1., y +. 1., z),
+          Vector3.create(x +. 1., y +. 1., z +. 1.),
+          Vector3.create(x +. 1., y, z +. 1.),
         )),
       );
     } else {
@@ -65,10 +65,10 @@ let get_exposed_block_face_verts = (b, chunk: array(Block.t)) => {
     if (right == Some(Air)) {
       Some(
         Right((
-          Vector3.create(x +. 1., y, z),
+          Vector3.create(x, y +. 1., z +. 1.),
+          Vector3.create(x, y, z +. 1.),
           Vector3.create(x +. 1., y, z +. 1.),
           Vector3.create(x +. 1., y +. 1., z +. 1.),
-          Vector3.create(x +. 1., y +. 1., z),
         )),
       );
     } else {
@@ -79,9 +79,9 @@ let get_exposed_block_face_verts = (b, chunk: array(Block.t)) => {
       Some(
         Left((
           Vector3.create(x, y, z),
-          Vector3.create(x, y, z +. 1.),
-          Vector3.create(x, y +. 1., z +. 1.),
           Vector3.create(x, y +. 1., z),
+          Vector3.create(x +. 1., y +. 1., z),
+          Vector3.create(x +. 1., y, z),
         )),
       );
     } else {
@@ -195,8 +195,8 @@ let gen_chunk_mesh = (_ci: int, chunk: array(Block.t)) => {
          | Bottom(_) => [0., (-1.), 0., 0., (-1.), 0.]
          | InFront(_) => [1., 0., 0., 1., 0., 0.]
          | Behind(_) => [(-1.), 0., 0., (-1.), 0., 0.]
-         | Left(_) => [0., 0., (-1.), 0., 0., (-1.)]
-         | Right(_) => [0., 0., 1., 0., 0., 1.]
+         | Left(_) => [0., 0., 1., 0., 0., 1.]
+         | Right(_) => [0., 0., (-1.), 0., 0., (-1.)]
          }
        )
     |> List.flatten;
