@@ -107,6 +107,6 @@ https://github.com/raysan5/raylib
 
 The Library of choice is Raylib, not only because it has OCaml bindings, it's well documented and battle-tested, it can produce builds for a variety of production environments including the browser with wasm 
 
-One drawback is that it's OpenGL and doesn't support Vulcan 
+One drawback is that it's OpenGL and doesn't support Vulkan 
 
 A benefit is that is has diverse build targets 
