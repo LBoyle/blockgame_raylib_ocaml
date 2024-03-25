@@ -3,6 +3,8 @@ working title
 
 A simple 3d game similar to Minecraft, with a custom engine written in ReasonML (OCaml) using the Raylib library
 
+Controls: WASD, Left Control to descend, Space to ascend, Esc to quit 
+
 --- 
 
 # Blocked 
