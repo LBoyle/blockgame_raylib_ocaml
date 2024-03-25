@@ -19,6 +19,14 @@ I have been thinking about getting comfortable with C++ and this has provided so
 
 ---
 
+## Some screenshots 
+
+![Drawing Cubes](./screenshots/blocks.png)
+
+![Drawing Meshes](./screenshots/mesh.png)
+
+---
+
 ## Setup 
 
 ### Linux
