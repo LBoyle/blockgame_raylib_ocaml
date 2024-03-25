@@ -25,7 +25,7 @@ Drawing cubes to show basic terrain generation
 
 ![Drawing Cubes](./screenshots/blocks.png)
 
-And the next step, generating a mesh to make it a single draw call 
+And the next step, generating a mesh to make it a single draw call, also back-face culling
 
 ![Drawing Meshes](./screenshots/mesh.png)
 
