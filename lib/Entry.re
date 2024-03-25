@@ -53,20 +53,15 @@ let draw_chunk_borders = cv => {
   );
 };
 
-let draw_offset_block = (origin, b, block) => {
-  let position = Vector3.add(index_to_3d_vec(b), origin);
-  switch (Block.get_block_colour(block)) {
-  | None => ()
-  | Some(blockColour) =>
-    draw_cube(position, 1., 1., 1., blockColour);
-    draw_cube_wires(position, 1., 1., 1., Color.maroon);
-  };
-};
-
-let block_position_1 = Vector3.create(0., 0., 0.);
-let block_position_2 = Vector3.create(2., 0., 0.);
-let block_position_3 = Vector3.create(0., 0., 2.);
-let block_position_4 = Vector3.create(0., 2., 0.);
+// let draw_offset_block = (origin, b, block) => {
+//   let position = Vector3.add(index_to_3d_vec(b), origin);
+//   switch (Block.get_block_colour(block)) {
+//   | None => ()
+//   | Some(blockColour) =>
+//     draw_cube(position, 1., 1., 1., blockColour);
+//     draw_cube_wires(position, 1., 1., 1., Color.maroon);
+//   };
+// };
 
 let draw_all = state => {
   begin_drawing();
@@ -81,25 +76,21 @@ let draw_all = state => {
       //   draw_offset_block(chunk_origin),
       //   World.get_chunk_at_index(ci),
       // );
+
       switch (Chunk.get_mesh_for_chunk_opt(ci)) {
       | None => ()
       | Some(chunk_mesh) =>
         let chunk_model = load_model_from_mesh(chunk_mesh.mesh);
-
         draw_model_wires(chunk_model, chunk_origin, 1.0, Color.maroon);
-
-        ();
       };
-
-      ();
     },
     state.activeChunks,
   );
 
-  draw_cube(block_position_1, 1., 1., 1., Color.red);
-  draw_cube(block_position_2, 1., 1., 1., Color.green);
-  draw_cube(block_position_3, 1., 1., 1., Color.blue);
-  draw_cube(block_position_4, 1., 1., 1., Color.brown);
+  draw_cube(Vector3.create(0., 0., 0.), 1., 1., 1., Color.red); // origin
+  draw_cube(Vector3.create(2., 0., 0.), 1., 1., 1., Color.green); // x
+  draw_cube(Vector3.create(0., 0., 2.), 1., 1., 1., Color.blue); // z
+  draw_cube(Vector3.create(0., 2., 0.), 1., 1., 1., Color.brown); // y
 
   end_mode_3d();
 
@@ -128,7 +119,6 @@ let rec loop = state => {
       World.ChunkCache.reset(World.chunk_cache);
       Noise.NoiseCache.reset(Noise.gradient_cache_1);
       Noise.NoiseCache.reset(Noise.noise_cache_1);
-      // Chunk.unload_chunk_meshes(); // This seems to be handled by GC
       Chunk.MeshCache.reset(Chunk.mesh_cache);
       close_window();
       state;
@@ -159,10 +149,13 @@ let rec loop = state => {
       let _ =
         List.iter(
           ci => {
-            Chunk.get_chunk_mesh(ci)
+            Chunk.get_mesh_for_chunk_generate(ci)
             |> (
               chunk =>
                 if (!chunk.loaded) {
+                  // This can cause a segfault
+                  // I suspect it's because OCaml GC has cleared
+                  // something that I have passed to the C code
                   upload_mesh(addr(chunk.mesh), false);
                   Chunk.MeshCache.replace(
                     Chunk.mesh_cache,

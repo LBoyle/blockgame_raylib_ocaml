@@ -3,6 +3,7 @@ open Raylib;
 
 // Because blocks are a 1d array this will select
 // blocks that are wrapped, on the other side of the chunk
+// Also doesn't account for blocks in neighboring chunks
 let get_block_neighbor_ids = b => {
   (
     b - 1,
@@ -129,8 +130,7 @@ let gen_chunk_mesh = (_ci: int, chunk: array(Block.t)) => {
   // verts is a bit dense, list(list(normal(tuple(Vector3))))
   // It's a filtered list of blocks,
   // each block is a filtered list of faces,
-  // each face is first a direction, then
-  // a 4-tuple of Vector3 coords
+  // each face is a direction with a 4-tuple of Vector3 coords
 
   let directional_face_verts =
     List.mapi(
@@ -147,7 +147,6 @@ let gen_chunk_mesh = (_ci: int, chunk: array(Block.t)) => {
 
   let flat_verts_list =
     directional_face_verts
-    // Two triangles for each face
     |> List.map(direction =>
          switch (direction) {
          | Top((v1, v2, v3, v4))
@@ -156,6 +155,7 @@ let gen_chunk_mesh = (_ci: int, chunk: array(Block.t)) => {
          | Behind((v1, v2, v3, v4))
          | Left((v1, v2, v3, v4))
          | Right((v1, v2, v3, v4)) =>
+           // Two triangles for each face
            [
              [
                Vector3.x(v1),
@@ -185,8 +185,8 @@ let gen_chunk_mesh = (_ci: int, chunk: array(Block.t)) => {
        )
     |> List.flatten;
 
-  // Normals are two unit vectors per square face,
-  // one for each triangle
+  // Normals are two grid-aligned unit vectors
+  // per square face, one for each triangle
   let flat_normals_list =
     directional_face_verts
     |> List.map(direction =>
@@ -201,19 +201,24 @@ let gen_chunk_mesh = (_ci: int, chunk: array(Block.t)) => {
        )
     |> List.flatten;
 
-  let chunk_mesh = Mesh.create();
-  Mesh.set_vertex_count(chunk_mesh, List.length(flat_verts_list) / 3);
-  Mesh.set_triangle_count(chunk_mesh, List.length(flat_verts_list) / 9);
-  Mesh.set_vertices(
-    chunk_mesh,
-    Ctypes.CArray.of_list(Ctypes.float, flat_verts_list),
-  );
-  Mesh.set_normals(
-    chunk_mesh,
-    Ctypes.CArray.of_list(Ctypes.float, flat_normals_list),
-  );
+  Mesh.create()
+  |> (
+    chunk_mesh => {
+      Mesh.set_vertex_count(chunk_mesh, List.length(flat_verts_list) / 3);
+      Mesh.set_triangle_count(chunk_mesh, List.length(flat_verts_list) / 9);
 
-  chunk_mesh;
+      Mesh.set_vertices(
+        chunk_mesh,
+        Ctypes.CArray.of_list(Ctypes.float, flat_verts_list),
+      );
+      Mesh.set_normals(
+        chunk_mesh,
+        Ctypes.CArray.of_list(Ctypes.float, flat_normals_list),
+      );
+
+      chunk_mesh;
+    }
+  );
 };
 
 module MeshCache =
@@ -236,7 +241,7 @@ let get_mesh_for_chunk_opt = ci =>
   | chunk_mesh => Some(chunk_mesh)
   };
 
-let get_chunk_mesh = ci => {
+let get_mesh_for_chunk_generate = ci => {
   switch (MeshCache.find(mesh_cache, ci)) {
   | chunk_mesh => chunk_mesh
   | exception _exn =>

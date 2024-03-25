@@ -32,8 +32,9 @@ let index_to_2d_vec = ci => {
 // negative positive, or positive negative, because world is
 // 1D transformed into 2D so it fills only half the graph.
 //
-// I might need to switch to a real 2D system to generate in
-// all directions. So I'm disabling it by clamping above zero
+// Because I'm not actually using an array, it's a Hashtable
+// I could use a tuple(int, int) for the key which would let
+// me generate the whole graph.
 let clamp_index_opt = i =>
   switch (i) {
   // | n when n <= - (worldSizeInChunks * worldSizeInChunks) => None
@@ -58,7 +59,7 @@ let get_active_chunks_ids = (pos: Vector3.t) => {
     (Vector3.x(pos) |> floor |> int_of_float) / chunkSize,
     (Vector3.z(pos) |> floor |> int_of_float) / chunkSize,
   );
-  // Player chunk index
+  // Current chunk the player is in
   let pidx = x + z * worldSizeInChunks;
   // FIX ME do this programatically using viewDistanceInChunks
   [
