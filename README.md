@@ -21,7 +21,11 @@ I have been thinking about getting comfortable with C++ and this has provided so
 
 ## Some screenshots 
 
+Drawing cubes to show basic terrain generation 
+
 ![Drawing Cubes](./screenshots/blocks.png)
+
+And the next step, generating a mesh to make it a single draw call 
 
 ![Drawing Meshes](./screenshots/mesh.png)
 
