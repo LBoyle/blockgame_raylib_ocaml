@@ -23,7 +23,7 @@ I have been thinking about getting comfortable with C++ and this has provided so
 
 ## Some screenshots 
 
-Drawing cubes to show basic terrain generation 
+Drawing cubes to show basic terrain generation and chunk-loading 
 
 ![Drawing Cubes](./screenshots/blocks.png)
 
