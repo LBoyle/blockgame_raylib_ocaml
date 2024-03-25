@@ -13,10 +13,11 @@ let worldSizeOffsetVec = Vector3.create(0., 0., 0.);
 let startingPosition = Vector3.create(4., 18., 4.);
 
 let setup = () => {
+  set_config_flags([ConfigFlags.Window_resizable]);
   init_window(vhWidth, vhHeight, "blockgame");
 
   disable_cursor();
-  // set_target_fps(60);
+  set_target_fps(60);
 
   Random.full_init(world_seed_arr);
   {
@@ -83,7 +84,7 @@ let draw_all = state => {
       switch (Chunk.get_mesh_for_chunk_opt(ci)) {
       | None => ()
       | Some(chunk_mesh) =>
-        let chunk_model = load_model_from_mesh(chunk_mesh);
+        let chunk_model = load_model_from_mesh(chunk_mesh.mesh);
 
         draw_model_wires(chunk_model, chunk_origin, 1.0, Color.maroon);
 
@@ -157,7 +158,20 @@ let rec loop = state => {
       let updated_active_chunks = get_active_chunks_ids(playerPosition);
       let _ =
         List.iter(
-          ci => Chunk.generate_mesh_side_effect(ci),
+          ci => {
+            Chunk.get_chunk_mesh(ci)
+            |> (
+              chunk =>
+                if (!chunk.loaded) {
+                  upload_mesh(addr(chunk.mesh), false);
+                  Chunk.MeshCache.replace(
+                    Chunk.mesh_cache,
+                    ci,
+                    {...chunk, loaded: true},
+                  );
+                }
+            )
+          },
           updated_active_chunks,
         );
       {...state, activeChunks: updated_active_chunks, playerPosition};
