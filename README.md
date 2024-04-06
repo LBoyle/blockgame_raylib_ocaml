@@ -11,13 +11,11 @@ Controls: WASD, Left Control to descend, Space to ascend, Esc to quit, Left Shif
 
 I've made good progress with this, but I've run into a blocker. The OCaml bindings for Raylib are built ontop of CTypes, I believe I've run into a situation where the OCaml garbage collecter is cleaning something that has been passed to Raylib's C code, causing a segfault
 
-I'm generating a mesh, the methods expect a C static array and I'm using carray.of_list, this could be a potential cause. Then I upload the mesh to VRAM by pointer, this is where the segfault occurrs and it's quite opaque to me so far 
-
-It's intermittent, sometimes it'll run happily for five minutes, other times it'll crash right away of after 30 seconds or something 
-
-There is also a memory leak of some kind that I haven't figured out 
-
 I have been thinking about getting comfortable with C++ and this has provided some impetus, so I'm moving on for now, though I'd like to solve these issues and come back to this project
+
+Edit: 
+
+Having reproduced this project in C++ I've encountered the same problem, or one that manifests in the same way, just got to understand the memory footprint better 
 
 ---
 
